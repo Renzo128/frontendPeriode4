@@ -9,9 +9,7 @@ import { Link } from "react-router-dom";
 const Group = ({
   group,
   index,
-  getCurrentUseremail,
   getCurrentUserID,
-  chat_url,
   changecurrentUser,
   changeCurrentchat,
   userstate,
@@ -19,17 +17,16 @@ const Group = ({
   // de groepen laten zien en de groep path aanmaken
   const path = `/chat/${group.id.id}`;
   const currentid = getCurrentUserID();
-  const currentuser = getCurrentUseremail();
   const [friend, setfriend] = useState({});
   useEffect(() => {
-    if (currentid.length > 0) {
+    if (currentid.length > 0) { // vriend als titel zetten
       Getfriends(group.users, currentid).then((data) => {
         setfriend(data);
       });
     }
   }, []);
 
-  const createChat = async (id) => {
+  const createChat = async (id) => {  // chat aanmaken
     const chatsref = collection(db, "chats");
     const q = query(chatsref, where("users", "array-contains", currentid));
     const querysnapshot = await getDocs(q);

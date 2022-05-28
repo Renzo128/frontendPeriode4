@@ -11,16 +11,15 @@ const Message = ({
   sender,
   currentUser,
 }) => {
-  let messenger = true;
-  if (currentUser == sender) {
+  let messenger = true; // kijken of dat jij degene bent die het bericht heeft verstuurd
+  if (currentUser === sender) {
     messenger = true;
   } else {
     messenger = false;
   }
-  console.log(index);
   return (
     <div className="text-center" id={index + "div"}>
-      {messenger ? (
+      {messenger ? ( // bericht verwijderen / updaten
         <div key={index} className="text-left">
           <button
             onClick={() => edit_value(index)}
@@ -54,11 +53,12 @@ const Message = ({
         </div>
       ) : (
         <div key={index} className="text-right">
-          {" "}
           {mess}
+          {
+            // bericht van andere gebruiker
+          }
         </div>
       )}
-      {}
     </div>
   );
 };

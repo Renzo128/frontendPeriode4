@@ -1,9 +1,10 @@
 import "./App.css";
-import { Route, Routes, Link } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Login from "./component/login/login";
 import Chat from "./component/chat/chat";
 import Register from "./component/register/register";
 function App() {
+    // Links aangemaakt om niet te hoeven herladen
   return (
     <div className="App">
       <Routes>

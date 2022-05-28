@@ -1,18 +1,17 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import login from "../login/login";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../config-firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const Register = () => {
-  let history = useNavigate();
+
+  let history = useNavigate(); 
   const [getRegisterEmail, setGetRegisterEmail] = useState("");
   const [getRegisterPassword, setGetRegisterPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState("");
 
-  const registerUser = async (e) => {
+  const registerUser = async (e) => { // gebruiker registreren in firebase
     e.preventDefault();
     try {
       const createdUser = await createUserWithEmailAndPassword(
@@ -29,15 +28,10 @@ const Register = () => {
       history("/chat", {
         state: { email: getRegisterEmail, id: createdUser.user.uid },
       });
-      // history("/chat", { email: getRegisterEmail, id: createdUser.user.uid });
     } catch (error) {}
   };
 
-  // const logUserIn = (e) => {  // doorsturen naar volgende pagina
-  //   e.preventDefault();
-  //   history('/chat');
 
-  // }
 
   return (
     <div className="container-fluid">
@@ -88,7 +82,7 @@ const Register = () => {
           <div className="col-lg-4"></div>
           <div className="col-lg-4 text-center">
             <button className="btn btn-secondary" onClick={registerUser}>
-              Login
+              Registreren
             </button>
           </div>
         </div>

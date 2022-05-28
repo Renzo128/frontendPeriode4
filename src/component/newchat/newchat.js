@@ -2,36 +2,22 @@ import React from "react";
 import "./newchat.css";
 import { db } from "../../config-firebase";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { useState, useEffect } from "react";
-import Getfriends from "../functions/function";
 import { Link } from "react-router-dom";
 
 const NewChat = ({
   group,
   index,
-  getCurrentUseremail,
   getCurrentUserID,
-  chat_url,
   changecurrentUser,
   changeCurrentchat,
   userstate,
 }) => {
   // de groepen laten zien en de groep path aanmaken
 
-  const path = `/chat/${index}`;
+  const path = `/chat/${index}`;  // path voor de chat
   const currentid = getCurrentUserID();
-  const currentuser = getCurrentUseremail();
-  const [friend, setfriend] = useState({});
 
-  useEffect(() => {
-    if (currentid.length > 0) {
-      //   Getfriends(group.users, currentid).then((data) => {
-      setfriend(group);
-      //   });
-    }
-  }, []);
-
-  const createChat = async (id) => {
+  const createChat = async (id) => {  // chat maken als deze niet bestaat
     const chatsref = collection(db, "chats");
     const q = query(chatsref, where("users", "array-contains", currentid));
     const querysnapshot = await getDocs(q);
@@ -45,7 +31,7 @@ const NewChat = ({
     } else {
     }
   };
-  //   console.log(group)
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -60,7 +46,6 @@ const NewChat = ({
             <Link to={path} defaultValue={group} state={userstate}>
               <p className="text-center name">{group}</p>
             </Link>
-            {}
           </button>
         </div>
       </div>

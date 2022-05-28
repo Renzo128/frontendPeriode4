@@ -1,7 +1,7 @@
 import React from "react";
 import "./chat.css";
 import Group from "../group/group";
-import Create_chat from "../create_chat/create_chat";
+import Create_Chat from "../create_chat/create_chat";
 import { useState, useEffect } from "react";
 import Message from "../message/message";
 import {
@@ -18,12 +18,10 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../config-firebase";
-import { useLocation, useParams } from "react-router-dom";
-import Getfriends from "../functions/function";
+import { useLocation } from "react-router-dom";
 import NewChat from "../newchat/newchat";
 
 const Chat = () => {
-  const { id } = useParams();
   const { state } = useLocation();
   const currentuser = state.email;
   const userLoggedInData = state;
@@ -38,10 +36,11 @@ const Chat = () => {
   const [chat, setchat] = useState(false);
 
   const createNewChat = () => {
-    if (chat == false) {
+    if (chat === false) {
+      // nieuwe chats laten zien aan de zijkant van de chat
       setchat(true);
       console.log("true");
-    } else if (chat == true) {
+    } else if (chat === true) {
       setchat(false);
       console.log("false");
     }
@@ -49,6 +48,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (getcurrentchat.length > 0) {
+      // alle berichten ophalen
       const messageRef = collection(db, "chats", getcurrentchat, "messages");
       const q = query(messageRef, orderBy("timestamp", "asc"));
       const unsubscribe = onSnapshot(q, (querysnapshot) => {
@@ -65,17 +65,21 @@ const Chat = () => {
   }, [getcurrentchat]);
 
   const getCurrentUserID = () => {
+    // ingelogde gebruiker zijn id ophalen
     return userLoggedInData.id;
   };
   const changeCurrentchat = (currentChat) => {
+    // huidige chat aanpassen
     setcurrentchat(currentChat);
   };
 
   const changecurrentUser = (displayName) => {
+    // gebruiker waarmee je aan het chatten bent aanpassen
     setfriendchat(displayName);
   };
 
   useEffect(() => {
+    // alle chats ophalen waar de ingelogde gebruiker in zit
     const userid = getCurrentUserID();
     const chatsref = collection(db, "chats");
     const q = query(chatsref, where("users", "array-contains", userid));
@@ -88,6 +92,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
+    // alle gebruikers uit de database ophalen behalve de gebruiker zelf
     const fetchchats = async () => {
       const queryfriend = collection(db, "users");
       const q = query(queryfriend, where("email", "!=", currentuser));
@@ -100,10 +105,12 @@ const Chat = () => {
   }, []);
 
   const getCurrentUseremail = () => {
+    // ingelogde gebruikers email ophalen
     return currentuser;
   };
 
   const getNewMessage = async (e) => {
+    // nieuw bericht toevoegen
     e.preventDefault();
 
     const usersRef = doc(db, "users", userLoggedInData.id);
@@ -129,18 +136,15 @@ const Chat = () => {
   };
 
   const edit_value = (index) => {
-    // berichten aanpassen
+    // bewerk veld laten zien
+
     setDisabled(true);
     setshowinput(true);
   };
   const update = (index, value) => {
-    // teksten aanpassen
+    // bericht aanpassen
     setshowinput(false);
-    const newTodos = [...getmessage];
-    newTodos[index] = value;
-    // setmessage(newTodos);
     setDisabled(false);
-    console.log(value);
     const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
     setDoc(messageRef, { message: value }, { merge: true });
   };
@@ -149,16 +153,6 @@ const Chat = () => {
     // waarde verwijderen
     const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
     await deleteDoc(messageRef);
-
-    // setmessage(newTodos);
-  };
-
-  const getGroupName = (e) => {
-    // nieuwe chat aanmaken
-    e.preventDefault();
-    const groupname = document.getElementById("inputname").value;
-    const newTodos = [...getGroup, groupname];
-    setGroup(newTodos);
   };
 
   return (
@@ -177,10 +171,7 @@ const Chat = () => {
       <div className="row">
         <div className="col-lg-2 ">
           <div className="chatrooms">
-            <Create_chat
-              getGroupName={getGroupName}
-              createNewChat={createNewChat}
-            />
+            <Create_Chat createNewChat={createNewChat} />
 
             {chat ? (
               <>
@@ -190,7 +181,6 @@ const Chat = () => {
                       key={group.id}
                       index={group.id}
                       group={group.displayName}
-                      getCurrentUseremail={getCurrentUseremail}
                       getCurrentUserID={getCurrentUserID}
                       changeCurrentchat={changeCurrentchat}
                       changecurrentUser={changecurrentUser}
@@ -205,10 +195,8 @@ const Chat = () => {
                   return (
                     <Group
                       key={group.id.id}
-                      chat_url={group.id.id}
                       index={group.id}
                       group={group}
-                      getCurrentUseremail={getCurrentUseremail}
                       getCurrentUserID={getCurrentUserID}
                       changecurrentUser={changecurrentUser}
                       changeCurrentchat={changeCurrentchat}
