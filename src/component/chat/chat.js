@@ -7,6 +7,7 @@ import Message from "../message/message";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -14,16 +15,16 @@ import {
   query,
   serverTimestamp,
   setDoc,
-  where
+  where,
 } from "firebase/firestore";
 import { db } from "../../config-firebase";
 import { useLocation, useParams } from "react-router-dom";
 import Getfriends from "../functions/function";
+import NewChat from "../newchat/newchat";
 
 const Chat = () => {
   const { id } = useParams();
   const { state } = useLocation();
-  console.log(state);
   const currentuser = state.email;
   const userLoggedInData = state;
   const [getmessage, setmessage] = useState([]);
@@ -34,27 +35,40 @@ const Chat = () => {
   const [getfriendchat, setfriendchat] = useState("Geen chat open");
   const [getcurrentchat, setcurrentchat] = useState("");
   const [input, setinput] = useState("");
+  const [chat, setchat] = useState(false);
 
-
+  const createNewChat = () => {
+    if (chat == false) {
+      setchat(true);
+      console.log("true");
+    } else if (chat == true) {
+      setchat(false);
+      console.log("false");
+    }
+  };
 
   useEffect(() => {
-    if(getcurrentchat.length > 0){
-   const messageRef = collection(db, "chats", getcurrentchat, "messages");
-   const q = query(messageRef, orderBy("timestamp", "asc"));
-   const unsubscribe = onSnapshot(q, (querysnapshot)=> {
-     setmessage(querysnapshot.docs.map(doc => ({...doc.data(), id:doc.id,
-    timestamp:doc.data().timestamp.toDate().getTime()})));
-   }) 
-   return unsubscribe
-}}, [getcurrentchat])
-
+    if (getcurrentchat.length > 0) {
+      const messageRef = collection(db, "chats", getcurrentchat, "messages");
+      const q = query(messageRef, orderBy("timestamp", "asc"));
+      const unsubscribe = onSnapshot(q, (querysnapshot) => {
+        setmessage(
+          querysnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+            timestamp: doc.data().timestamp?.toDate().getTime(),
+          }))
+        );
+      });
+      return unsubscribe;
+    }
+  }, [getcurrentchat]);
 
   const getCurrentUserID = () => {
     return userLoggedInData.id;
   };
   const changeCurrentchat = (currentChat) => {
     setcurrentchat(currentChat);
-    // console.log(getcurrentchat)
   };
 
   const changecurrentUser = (displayName) => {
@@ -91,10 +105,9 @@ const Chat = () => {
 
   const getNewMessage = async (e) => {
     e.preventDefault();
-    console.log(userLoggedInData.id)
 
     const usersRef = doc(db, "users", userLoggedInData.id);
-    setDoc(usersRef, { lastSeen: serverTimestamp() }, {merge:true});
+    setDoc(usersRef, { lastSeen: serverTimestamp() }, { merge: true });
 
     const messageRef = collection(db, "chats", getcurrentchat, "messages");
     await addDoc(messageRef, {
@@ -127,13 +140,16 @@ const Chat = () => {
     newTodos[index] = value;
     // setmessage(newTodos);
     setDisabled(false);
+    console.log(value);
+    const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
+    setDoc(messageRef, { message: value }, { merge: true });
   };
 
-  const delete_value = (index) => {
+  const delete_value = async (index) => {
     // waarde verwijderen
-    const newTodos = [...getmessage];
+    const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
+    await deleteDoc(messageRef);
 
-    newTodos.splice(index, 1);
     // setmessage(newTodos);
   };
 
@@ -161,30 +177,47 @@ const Chat = () => {
       <div className="row">
         <div className="col-lg-2 ">
           <div className="chatrooms">
-            <Create_chat getGroupName={getGroupName} />
-            {/* {getGroup.map((group, index) => {
-                  return(
-                   
-                  <Group key={group.id} index={group.id} group={group.displayName} getCurrentUseremail={getCurrentUseremail}  getCurrentUserID={getCurrentUserID} />
-                  )
-              })
-            } */}
+            <Create_chat
+              getGroupName={getGroupName}
+              createNewChat={createNewChat}
+            />
 
-            {getGroupNames.map((group, index) => {
-              return (
-                <Group
-                  key={group.id}
-                  chat_url={group.id.id}
-                  index={group.id}
-                  group={group}
-                  getCurrentUseremail={getCurrentUseremail}
-                  getCurrentUserID={getCurrentUserID}
-                  changecurrentUser={changecurrentUser}
-                  changeCurrentchat={changeCurrentchat}
-                  userstate={state}
-                />
-              );
-            })}
+            {chat ? (
+              <>
+                {getGroup.map((group, index) => {
+                  return (
+                    <NewChat
+                      key={group.id}
+                      index={group.id}
+                      group={group.displayName}
+                      getCurrentUseremail={getCurrentUseremail}
+                      getCurrentUserID={getCurrentUserID}
+                      changeCurrentchat={changeCurrentchat}
+                      changecurrentUser={changecurrentUser}
+                      userstate={state}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                {getGroupNames.map((group, index) => {
+                  return (
+                    <Group
+                      key={group.id.id}
+                      chat_url={group.id.id}
+                      index={group.id}
+                      group={group}
+                      getCurrentUseremail={getCurrentUseremail}
+                      getCurrentUserID={getCurrentUserID}
+                      changecurrentUser={changecurrentUser}
+                      changeCurrentchat={changeCurrentchat}
+                      userstate={state}
+                    />
+                  );
+                })}
+              </>
+            )}
           </div>
         </div>
         <div className="col-lg-9 form-group whatsapp-chat-container">
@@ -211,7 +244,7 @@ const Chat = () => {
         <div className="col-lg-10">
           <form onSubmit={getNewMessage}>
             <input
-            onChange={(e) => setinput(e.target.value)}
+              onChange={(e) => setinput(e.target.value)}
               type="text"
               className="form-control bottom-input"
               id="message"
