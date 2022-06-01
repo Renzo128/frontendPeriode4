@@ -15,7 +15,7 @@ const Group = ({
   userstate,
 }) => {
   // de groepen laten zien en de groep path aanmaken
-  const path = `/chat/${group.id.id}`;
+  const path = `/chat/${group.id}`;
   const currentid = getCurrentUserID();
   const [friend, setfriend] = useState({});
   useEffect(() => {
@@ -49,7 +49,7 @@ const Group = ({
             onClick={() => {
               createChat(currentid);
               changecurrentUser(friend.displayName);
-              changeCurrentchat(group.id.id);
+              changeCurrentchat(group.id);
             }}
           >
             <Link to={path} defaultValue={friend.displayName} state={userstate}>
