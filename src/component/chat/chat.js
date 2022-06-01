@@ -34,15 +34,15 @@ const Chat = () => {
   const [getcurrentchat, setcurrentchat] = useState("");
   const [input, setinput] = useState("");
   const [chat, setchat] = useState(false);
+  const [getuser,setuser] = useState("");
+  console.log(state)
 
   const createNewChat = () => {
     if (chat === false) {
       // nieuwe chats laten zien aan de zijkant van de chat
       setchat(true);
-      console.log("true");
     } else if (chat === true) {
       setchat(false);
-      console.log("false");
     }
   };
 
@@ -64,6 +64,20 @@ const Chat = () => {
     }
   }, [getcurrentchat]);
 
+  useEffect(() => {
+    // haal user op
+    const fetchuser = async () => {
+      const queryfriend = collection(db, "users");
+      const q = query(queryfriend, where("email", "==", currentuser));
+      const querysnapshot = await getDocs(q);
+      setuser(
+        querysnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
+    };
+    fetchuser();
+  }, []);
+
+
   const getCurrentUserID = () => {
     // ingelogde gebruiker zijn id ophalen
     return userLoggedInData.id;
@@ -76,6 +90,7 @@ const Chat = () => {
   const changecurrentUser = (displayName) => {
     // gebruiker waarmee je aan het chatten bent aanpassen
     setfriendchat(displayName);
+      document.getElementById("message").disabled = false
   };
 
   useEffect(() => {
@@ -85,7 +100,7 @@ const Chat = () => {
     const q = query(chatsref, where("users", "array-contains", userid));
     const unsubscribe = onSnapshot(q, (querysnapshot) => {
       setGroupName(
-        querysnapshot.docs.map((doc) => ({ ...doc.data(), id: doc }))
+        querysnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
       );
     });
     return unsubscribe;
@@ -140,6 +155,10 @@ const Chat = () => {
 
     setDisabled(true);
     setshowinput(true);
+    var element = document.getElementById(index + "input");
+    element.classList.remove("hidden");
+    var element2 = document.getElementById(index + "button");
+    element2.classList.remove("hidden");
   };
   const update = (index, value) => {
     // bericht aanpassen
@@ -147,6 +166,10 @@ const Chat = () => {
     setDisabled(false);
     const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
     setDoc(messageRef, { message: value }, { merge: true });
+    var element = document.getElementById(index + "input");
+    element.classList.add("hidden");
+    var element2 = document.getElementById(index + "button");
+    element2.classList.add("hidden");
   };
 
   const delete_value = async (index) => {
@@ -154,12 +177,12 @@ const Chat = () => {
     const messageRef = doc(db, "chats", getcurrentchat, "messages", index);
     await deleteDoc(messageRef);
   };
-
+  console.log(getuser[0].displayName)
   return (
     <div className="container-fluid">
       <div className="row">
         <div className="col-lg-2">
-          <p className="text-left">{currentuser}</p>
+          <p className="text-left">{getuser[0].displayName}</p>
         </div>
         <div className="col-lg-10">
           <p id="currentFriend" className="text-center">
@@ -231,7 +254,7 @@ const Chat = () => {
         <div className="col-lg-2"></div>
         <div className="col-lg-10">
           <form onSubmit={getNewMessage}>
-            <input
+            <input disabled
               onChange={(e) => setinput(e.target.value)}
               type="text"
               className="form-control bottom-input"

@@ -1,4 +1,5 @@
 import React from "react";
+import "./message.css";
 
 const Message = ({
   mess,
@@ -38,10 +39,10 @@ const Message = ({
             Delete
           </button>{" "}
           <div id={index + "delete"}>{mess}</div>
-          {showinput ? (
+          
             <p>
-              <input id={index + "input"} type="tekst" defaultValue={mess} />
-              <button
+              <input className="hidden" id={index + "input"} type="tekst" defaultValue={mess} />
+              <button className="hidden" id={index + "button"}
                 onClick={() =>
                   update(index, document.getElementById(index + "input").value)
                 }
@@ -49,7 +50,6 @@ const Message = ({
                 Save
               </button>
             </p>
-          ) : null}
         </div>
       ) : (
         <div key={index} className="text-right">

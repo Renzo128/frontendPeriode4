@@ -43,7 +43,7 @@ const Group = ({
 
   return (
     <div className="container-fluid">
-      <div className="row">
+      <div className="row spacing">
         <div className="col-lg-12">
           <button
             onClick={() => {

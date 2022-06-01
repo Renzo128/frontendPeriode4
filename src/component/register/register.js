@@ -10,6 +10,7 @@ const Register = () => {
   let history = useNavigate(); 
   const [getRegisterEmail, setGetRegisterEmail] = useState("");
   const [getRegisterPassword, setGetRegisterPassword] = useState("");
+  const [getusername, setusername] = useState("");
 
   const registerUser = async (e) => { // gebruiker registreren in firebase
     e.preventDefault();
@@ -22,7 +23,7 @@ const Register = () => {
       const userdata = {
         email: createdUser.user.email,
         lastSeen: serverTimestamp(),
-        displayName: getRegisterEmail,
+        displayName: getusername,
       };
       await setDoc(doc(db, "users", createdUser.user.uid), userdata);
       history("/chat", {
@@ -43,6 +44,23 @@ const Register = () => {
           <div className="col-lg-4">Registeren</div>
         </div>
         <div className="mt-3"></div>
+
+        <div className="row">
+          <div className="col-lg-4"></div>
+          <div className="col-lg-4">Gebruikersnaam</div>
+        </div>
+        <div className="row">
+          <div className="col-lg-4"></div>
+          <div className="col-lg-4">
+            <input
+              type="text"
+              className="form-control"
+              min={0}
+              onChange={(event) => setusername(event.target.value)}
+            ></input>
+          </div>
+        </div>
+
 
         <div className="row">
           <div className="col-lg-4"></div>

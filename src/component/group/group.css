@@ -1,3 +1,8 @@
 .name{
     padding:5px;
+    width:150px;
+    overflow:auto;
+}
+.spacing{
+    margin-top:5px;
 }

@@ -14,10 +14,11 @@ const NewChat = ({
 }) => {
   // de groepen laten zien en de groep path aanmaken
 
-  const path = `/chat/${index}`;  // path voor de chat
+  const path = `/chat/${index}`; // path voor de chat
   const currentid = getCurrentUserID();
 
-  const createChat = async (id) => {  // chat maken als deze niet bestaat
+  const createChat = async (id) => {
+    // chat maken als deze niet bestaat
     const chatsref = collection(db, "chats");
     const q = query(chatsref, where("users", "array-contains", currentid));
     const querysnapshot = await getDocs(q);
@@ -34,7 +35,7 @@ const NewChat = ({
 
   return (
     <div className="container-fluid">
-      <div className="row">
+      <div className="row spacing">
         <div className="col-lg-12">
           <button
             onClick={() => {
