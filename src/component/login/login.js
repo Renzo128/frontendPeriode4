@@ -59,7 +59,7 @@ const Login = () => {
           <div className="col-lg-4"></div>
           <div className="col-lg-4">
             <input
-              type="text"
+              type="password"
               className="form-control"
               id="loginPassword"
               onChange={(event) => setGetLoginPassword(event.target.value)}
